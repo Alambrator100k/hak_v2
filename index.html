@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام هاكر v3.1.4</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="hacker-theme">
+    <div class="scanlines"></div>
+    <div class="noise"></div>
+    
+    <header class="terminal-header">
+        <div class="logo">
+            <span class="blink">_</span> H4CK3R SYST3M v3.1.4
+        </div>
+        <div class="status-bar">
+            <span class="status-item">USER: [ANONYMOUS]</span>
+            <span class="status-item">ACCESS: [LEVEL 1]</span>
+            <span class="status-item">IP: [127.0.0.1]</span>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="terminal" id="mainTerminal">
+            <div class="terminal-output" id="terminalOutput">
+                <div class="terminal-line">
+                    <span class="prompt">root@h4ck3r:~$</span> نظام التشغيل جاهز
+                </div>
+                <div class="terminal-line">
+                    <span class="prompt">root@h4ck3r:~$</span> تحميل وحدات النظام...
+                </div>
+                <div class="terminal-line">
+                    <span class="prompt">root@h4ck3r:~$</span> الاتصال بالخادم الرئيسي...
+                </div>
+                <div class="terminal-line success">
+                    <span class="prompt">root@h4ck3r:~$</span> تم الاتصال بنجاح
+                </div>
+                <div class="terminal-line">
+                    <span class="prompt">root@h4ck3r:~$</span> جاهز للأوامر
+                </div>
+            </div>
+            <div class="terminal-input">
+                <span class="prompt">root@h4ck3r:~$</span>
+                <input type="text" id="terminalInput" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+            </div>
+        </div>
+
+        <div class="hacker-tools" id="hackerTools">
+            <div class="tool" onclick="runCommand('scan ip')">
+                <i class="fas fa-network-wired"></i>
+                <span>مسح الشبكة</span>
+            </div>
+            <div class="tool" onclick="runCommand('track phone')">
+                <i class="fas fa-phone"></i>
+                <span>تتبع رقم</span>
+            </div>
+            <div class="tool" onclick="runCommand('ddos start')">
+                <i class="fas fa-bolt"></i>
+                <span>هجوم DDoS</span>
+            </div>
+            <div class="tool" onclick="runCommand('decrypt files')">
+                <i class="fas fa-lock-open"></i>
+                <span>فك التشفير</span>
+            </div>
+            <div class="tool" onclick="runCommand('bruteforce')">
+                <i class="fas fa-key"></i>
+                <span>اختراق كلمات السر</span>
+            </div>
+            <div class="tool" onclick="runCommand('social scan')">
+                <i class="fas fa-user-secret"></i>
+                <span>مسح وسائل التواصل</span>
+            </div>
+        </div>
+
+        <div class="matrix-effect" id="matrixEffect"></div>
+    </div>
+
+    <div class="modal" id="disclaimerModal">
+        <div class="modal-content hacker-modal">
+            <h2><i class="fas fa-exclamation-triangle"></i> تنبيه هام</h2>
+            <div class="modal-body">
+                <p>هذا الموقع هو محاكاة لأغراض تعليمية وتوعوية فقط.</p>
+                <p>جميع الوظائف المعروضة هي وهمية ولا تقوم بأي عمليات اختراق حقيقية.</p>
+                <p>الاختراق غير القانوني جريمة يعاقب عليها القانون.</p>
+                <p>باستخدامك لهذا الموقع، أنت توافق على أنك لن تستخدم هذه المعلومات لأي غرض غير قانوني.</p>
+            </div>
+            <button onclick="closeModal('disclaimerModal')">أنا أتفهم</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
