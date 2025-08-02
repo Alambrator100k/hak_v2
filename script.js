@@ -1,341 +1,245 @@
-// قائمة المستخدمين المعتمدين (في تطبيق حقيقي، يجب تخزينها في قاعدة بيانات)
-const approvedUsers = [6113061454]; // يمكنك إضافة المزيد من المستخدمين هنا
-let currentUser = null;
-
-// عناصر DOM
-const authSection = document.getElementById('authSection');
-const loginForm = document.getElementById('loginForm');
-const loginError = document.getElementById('loginError');
-const mainMenu = document.getElementById('mainMenu');
-const backBtn = document.getElementById('backBtn');
-
-// أحداث تسجيل الدخول
-loginForm.addEventListener('submit', function(e) {
-    e.preventDefault();
-    const userId = document.getElementById('userId').value.trim();
-    
-    if (!userId) {
-        loginError.textContent = 'الرجاء إدخال معرف المستخدم';
-        return;
-    }
-    
-    // في تطبيق حقيقي، يجب التحقق من الخادم
-    if (approvedUsers.includes(parseInt(userId))) {
-        currentUser = userId;
-        authSection.style.display = 'none';
-        mainMenu.style.display = 'block';
-        loginError.textContent = '';
-    } else {
-        loginError.textContent = 'المستخدم غير معتمد. الرجاء الاتصال بالمسؤول.';
-    }
-});
-
-// عرض القسم المحدد وإخفاء الباقي
-function showSection(sectionId) {
-    document.querySelectorAll('.section').forEach(section => {
-        section.style.display = 'none';
-    });
-    
-    document.getElementById(sectionId).style.display = 'block';
-    backBtn.style.display = 'block';
-    mainMenu.style.display = 'none';
-}
-
-// العودة للقائمة الرئيسية
-function showMainMenu() {
-    document.querySelectorAll('.section').forEach(section => {
-        section.style.display = 'none';
-    });
-    
-    backBtn.style.display = 'none';
-    mainMenu.style.display = 'block';
-}
-
-// عرض IP المستخدم
-function showMyIP() {
-    fetch('https://api.ipify.org?format=json')
-        .then(response => response.json())
-        .then(data => {
-            const resultDiv = document.createElement('div');
-            resultDiv.innerHTML = `
-                <h3>IP الخاص بك:</h3>
-                <p>${data.ip}</p>
-                <button onclick="copyToClipboard('${data.ip}')">نسخ</button>
-            `;
-            
-            // عرض النتيجة في نافذة منبثقة
-            alert(`IP الخاص بك هو: ${data.ip}`);
-        })
-        .catch(error => {
-            alert('حدث خطأ أثناء جلب IP الخاص بك');
-            console.error(error);
-        });
-}
-
-// نسخ النص إلى الحافظة
-function copyToClipboard(text) {
-    navigator.clipboard.writeText(text)
-        .then(() => alert('تم النسخ إلى الحافظة'))
-        .catch(err => console.error('Failed to copy: ', err));
-}
-
-// عرض معلومات البوت
-function showInfo() {
-    document.getElementById('infoModal').style.display = 'block';
-}
-
-// عرض القنوات
-function showChannels() {
-    document.getElementById('channelsModal').style.display = 'block';
-}
+// عرض تنبيه الاستخدام عند تحميل الصفحة
+window.onload = function() {
+    document.getElementById('disclaimerModal').style.display = 'flex';
+    startMatrixEffect();
+    typeInitialTerminalLines();
+};
 
 // إغلاق النافذة المنبثقة
 function closeModal(modalId) {
     document.getElementById(modalId).style.display = 'none';
 }
 
-// معالجة تتبع IP
-document.getElementById('ipTrackForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    const ipAddress = document.getElementById('ipAddress').value.trim();
-    const resultDiv = document.getElementById('ipResult');
+// تأثير المصفوفة
+function startMatrixEffect() {
+    const canvas = document.createElement('canvas');
+    canvas.id = 'matrixCanvas';
+    document.getElementById('matrixEffect').appendChild(canvas);
     
-    resultDiv.innerHTML = '<p>جاري التتبع...</p>';
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
     
-    fetch(`https://ipwho.is/${ipAddress}`)
-        .then(response => response.json())
-        .then(data => {
-            if (!data.success) {
-                resultDiv.innerHTML = '<p class="error">IP غير صالح أو غير مدعوم</p>';
-                return;
-            }
-            
-            resultDiv.innerHTML = `
-                <h3>نتائج التتبع:</h3>
-                <p><strong>الدولة:</strong> ${data.country}</p>
-                <p><strong>المدينة:</strong> ${data.city}</p>
-                <p><strong>المنطقة:</strong> ${data.region}</p>
-                <p><strong>القارة:</strong> ${data.continent}</p>
-                <p><strong>الموقع:</strong> <a href="https://maps.google.com/?q=${data.latitude},${data.longitude}" target="_blank">عرض على الخريطة</a></p>
-                <p><strong>المزود:</strong> ${data.connection.org || 'غير معروف'}</p>
-                <p><strong>ASN:</strong> ${data.connection.asn || 'غير معروف'}</p>
-                <p><strong>التوقيت:</strong> ${data.timezone.current_time || 'غير معروف'}</p>
-            `;
-        })
-        .catch(error => {
-            resultDiv.innerHTML = '<p class="error">حدث خطأ أثناء جلب البيانات</p>';
-            console.error(error);
-        });
-});
-
-// معالجة تتبع رقم الهاتف
-document.getElementById('phoneTrackForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    const phoneNumber = document.getElementById('phoneNumber').value.trim();
-    const resultDiv = document.getElementById('phoneResult');
+    const katakana = 'アァカサタナハマヤャラワガザダバパイィキシチニヒミリヰギジヂビピウゥクスツヌフムユュルグズブヅプエェケセテネヘメレヱゲゼデベペオォコソトノホモヨョロヲゴゾドボポヴッン';
+    const latin = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const nums = '0123456789';
+    const symbols = '!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~';
+    const alphabet = katakana + latin + nums + symbols;
     
-    resultDiv.innerHTML = '<p>جاري التتبع...</p>';
+    const fontSize = 16;
+    const columns = canvas.width / fontSize;
+    const rainDrops = [];
     
-    // في تطبيق حقيقي، يجب استخدام خدمة خارجية أو API
-    // هذا مثال مبسط فقط
-    try {
-        // استخدام مكتبة libphonenumber-js بدلاً من phonenumbers
-        const phoneInfo = {
-            country: 'مصر', // سيتم تحديدها من رقم الهاتف
-            carrier: 'فودافون', // سيتم تحديدها من رقم الهاتف
-            timezone: 'Africa/Cairo'
-        };
-        
-        resultDiv.innerHTML = `
-            <h3>نتائج التتبع:</h3>
-            <p><strong>الموقع:</strong> ${phoneInfo.country}</p>
-            <p><strong>المشغل:</strong> ${phoneInfo.carrier}</p>
-            <p><strong>المنطقة الزمنية:</strong> ${phoneInfo.timezone}</p>
-            <p><strong>ملاحظة:</strong> هذه معلومات تجريبية فقط</p>
-        `;
-    } catch (error) {
-        resultDiv.innerHTML = '<p class="error">رقم الهاتف غير صالح</p>';
-        console.error(error);
+    for (let x = 0; x < columns; x++) {
+        rainDrops[x] = 1;
     }
-});
+    
+    const draw = () => {
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        ctx.fillStyle = '#0f0';
+        ctx.font = fontSize + 'px monospace';
+        
+        for (let i = 0; i < rainDrops.length; i++) {
+            const text = alphabet.charAt(Math.floor(Math.random() * alphabet.length));
+            ctx.fillText(text, i * fontSize, rainDrops[i] * fontSize);
+            
+            if (rainDrops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                rainDrops[i] = 0;
+            }
+            rainDrops[i]++;
+        }
+    };
+    
+    setInterval(draw, 30);
+}
 
-// معالجة تتبع اسم المستخدم
-document.getElementById('usernameTrackForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    const username = document.getElementById('username').value.trim();
-    const resultDiv = document.getElementById('usernameResult');
-    
-    resultDiv.innerHTML = '<p>جاري البحث...</p>';
-    
-    // قائمة المواقع للبحث
-    const socialSites = [
-        { name: 'Facebook', url: `https://facebook.com/${username}` },
-        { name: 'Twitter', url: `https://twitter.com/${username}` },
-        { name: 'Instagram', url: `https://instagram.com/${username}` },
-        { name: 'LinkedIn', url: `https://linkedin.com/in/${username}` },
-        { name: 'GitHub', url: `https://github.com/${username}` },
-        { name: 'YouTube', url: `https://youtube.com/${username}` }
+// كتابة الأسطر الأولية في المحاكاة الطرفية
+function typeInitialTerminalLines() {
+    const lines = [
+        { text: "فحص أمن النظام...", delay: 100 },
+        { text: "التحقق من الثغرات...", delay: 200 },
+        { text: "تحميل قاعدة بيانات الأهداف...", delay: 300 },
+        { text: "الاتصال بالخوادم السرية...", delay: 400 },
+        { text: "تهيئة أدوات الاختراق...", delay: 500 },
+        { text: "النظام جاهز للاستخدام", delay: 600, class: "success" }
     ];
     
-    let resultsHTML = '<h3>نتائج البحث:</h3><div class="social-results">';
+    const terminalOutput = document.getElementById('terminalOutput');
     
-    // التحقق من كل موقع (هذا سيعمل فقط إذا كان الموقع يسمح بذلك)
-    socialSites.forEach(site => {
-        resultsHTML += `
-            <div class="social-site">
-                <p><strong>${site.name}:</strong> 
-                <a href="${site.url}" target="_blank">${site.url}</a>
-                <span class="status">جاري التحقق...</span></p>
-            </div>
-        `;
+    lines.forEach((line, index) => {
+        setTimeout(() => {
+            const lineElement = document.createElement('div');
+            lineElement.className = `terminal-line ${line.class || ''}`;
+            lineElement.innerHTML = `<span class="prompt">root@h4ck3r:~$</span> ${line.text}`;
+            terminalOutput.appendChild(lineElement);
+            terminalOutput.scrollTop = terminalOutput.scrollHeight;
+        }, line.delay);
     });
-    
-    resultsHTML += '</div>';
-    resultDiv.innerHTML = resultsHTML;
-    
-    // ملاحظة: في المتصفح، لا يمكنك التحقق من حالة الصفحة بسبب سياسة CORS
-    // هذا مثال توضيحي فقط
-    setTimeout(() => {
-        document.querySelectorAll('.social-site .status').forEach(el => {
-            el.textContent = 'غير متأكد (CORS يمنع التحقق)';
-            el.style.color = '#e67e22';
-        });
-    }, 2000);
-});
+}
 
-// معالجة إسبام المكالمات
-document.getElementById('callSpamForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    const phoneNumber = document.getElementById('callNumber').value.trim();
-    const callCount = document.getElementById('callCount').value;
-    const resultDiv = document.getElementById('callSpamResult');
-    
-    resultDiv.innerHTML = '<p>جاري الإعداد...</p>';
-    
-    // في تطبيق حقيقي، هذا يتطلب اتصالاً بالخادم
-    alert(`هذه الميزة تتطلب اتصالاً بالخادم الخلفي. لا يمكن تنفيذها مباشرة من المتصفح.`);
-    
-    // محاكاة العملية
-    let count = 0;
-    const interval = setInterval(() => {
-        count++;
-        resultDiv.innerHTML = `<p>إرسال المكالمة ${count} من ${callCount}...</p>`;
+// معالجة الأوامر
+document.getElementById('terminalInput').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        const command = this.value.trim();
+        this.value = '';
         
-        if (count >= callCount) {
-            clearInterval(interval);
-            resultDiv.innerHTML += '<p class="success">تم الانتهاء من إسبام المكالمات!</p>';
+        if (command) {
+            processCommand(command);
         }
-    }, 1000);
+    }
 });
 
-// معالجة إسبام الرسائل
-document.getElementById('smsSpamForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    const phoneNumber = document.getElementById('smsNumber').value.trim();
-    const smsCount = document.getElementById('smsCount').value;
-    const resultDiv = document.getElementById('smsSpamResult');
+function runCommand(command) {
+    document.getElementById('terminalInput').value = command;
+    processCommand(command);
+}
+
+function processCommand(command) {
+    const terminalOutput = document.getElementById('terminalOutput');
+    const promptLine = document.createElement('div');
+    promptLine.className = 'terminal-line';
+    promptLine.innerHTML = `<span class="prompt">root@h4ck3r:~$</span> ${command}`;
+    terminalOutput.appendChild(promptLine);
     
-    resultDiv.innerHTML = '<p>جاري الإعداد...</p>';
+    // معالجة الأوامر
+    let response = '';
+    let responseClass = '';
     
-    // في تطبيق حقيقي، هذا يتطلب اتصالاً بالخادم
-    alert(`هذه الميزة تتطلب اتصالاً بالخادم الخلفي. لا يمكن تنفيذها مباشرة من المتصفح.`);
-    
-    // محاكاة العملية
-    let count = 0;
-    const interval = setInterval(() => {
-        count++;
-        resultDiv.innerHTML = `<p>إرسال الرسالة ${count} من ${smsCount}...</p>`;
+    if (command === 'help' || command === 'مساعدة') {
+        response = `الأوامر المتاحة:
+        - scan ip [عنوان]: مسح عنوان IP
+        - track phone [رقم]: تتبع رقم هاتف
+        - ddos start [رابط]: بدء هجوم DDoS
+        - decrypt files: فك تشفير الملفات
+        - bruteforce: اختراق كلمات السر
+        - social scan [اسم مستخدم]: مسح وسائل التواصل
+        - clear: مسح الشاشة
+        - help: عرض هذه المساعدة`;
+    } 
+    else if (command.startsWith('scan ip')) {
+        const ip = command.split(' ')[2] || '192.168.1.1';
+        response = `جاري مسح العنوان ${ip}...
+        [✓] تم اكتشاف الثغرات: 3
+        [✓] نقاط الدخول المحتملة: 2
+        [✓] أنظمة التشغيل المكتشفة: Linux, Windows
+        [✓] الوقت المستغرق: 2.4 ثانية`;
+        responseClass = 'success';
+    }
+    else if (command.startsWith('track phone')) {
+        const phone = command.split(' ')[2] || '+20123456789';
+        response = `جاري تتبع الرقم ${phone}...
+        [✓] الموقع: القاهرة، مصر
+        [✓] المشغل: فودافون
+        [✓] جهة الاتصال: محمد أحمد
+        [✓] آخر موقع معروف: 30.0444° N, 31.2357° E`;
+        responseClass = 'success';
+    }
+    else if (command.startsWith('ddos start')) {
+        const url = command.split(' ')[2] || 'example.com';
+        response = `بدء هجوم DDoS على ${url}...
+        [✓] تم إرسال 1245 طلب في الثانية
+        [✓] استجابة الخادم: 503 Service Unavailable
+        [✓] الوقت المستغرق: 5.7 ثانية
+        [!] تحذير: هذا الهجوم قد يكون غير قانوني في بعض الدول`;
+        responseClass = 'warning';
         
-        if (count >= smsCount) {
-            clearInterval(interval);
-            resultDiv.innerHTML += '<p class="success">تم الانتهاء من إسبام الرسائل!</p>';
-        }
-    }, 800);
-});
-
-// معالجة إسبام الجيميل
-document.getElementById('gmailSpamForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    const email = document.getElementById('gmailAddress').value.trim();
-    const count = document.getElementById('gmailCount').value;
-    const resultDiv = document.getElementById('gmailSpamResult');
-    
-    resultDiv.innerHTML = '<p>جاري الإعداد...</p>';
-    
-    // في تطبيق حقيقي، هذا يتطلب اتصالاً بالخادم
-    alert(`هذه الميزة تتطلب اتصالاً بالخادم الخلفي. لا يمكن تنفيذها مباشرة من المتصفح.`);
-    
-    // محاكاة العملية
-    let sent = 0;
-    const interval = setInterval(() => {
-        sent++;
-        resultDiv.innerHTML = `<p>إرسال الرسالة ${sent} من ${count} إلى ${email}...</p>`;
-        
-        if (sent >= count) {
-            clearInterval(interval);
-            resultDiv.innerHTML += '<p class="success">تم الانتهاء من إسبام الجيميل!</p>';
-        }
-    }, 500);
-});
-
-// متغيرات هجوم DDoS
-let ddosActive = false;
-let successRequests = 0;
-let serverErrors = 0;
-let otherErrors = 0;
-
-// معالجة هجوم DDoS
-document.getElementById('ddosForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    const targetUrl = document.getElementById('targetUrl').value.trim();
-    const threadCount = document.getElementById('threadCount').value;
-    
-    // التحقق من صحة الرابط
-    if (!targetUrl.startsWith('http://') && !targetUrl.startsWith('https://')) {
-        alert('الرجاء إدخال رابط يبدأ بـ http:// أو https://');
+        // محاكاة الهجوم
+        simulateDDoS();
+    }
+    else if (command === 'decrypt files') {
+        response = `جاري فك تشفير الملفات...
+        [✓] تم فك تشفير 14 ملف
+        [✓] الملفات المتاحة الآن في /downloads/decrypted
+        [!] تحذير: بعض الملفات قد تكون محمية بحقوق الملكية`;
+        responseClass = 'success';
+    }
+    else if (command === 'bruteforce') {
+        response = `بدء هجوم القوة الغاشمة...
+        [✓] اختبار 245 كلمة سر في الثانية
+        [✓] كلمة السر المكتشفة: 'password123'
+        [✓] الوقت المستغرق: 12.3 ثانية
+        [!] تحذير: هذا الهجوم غير قانوني بدون إذن`;
+        responseClass = 'warning';
+    }
+    else if (command.startsWith('social scan')) {
+        const username = command.split(' ')[2] || 'johndoe';
+        response = `جاري مسح وسائل التواصل لـ ${username}...
+        [✓] Facebook: https://facebook.com/${username}
+        [✓] Twitter: https://twitter.com/${username}
+        [✓] Instagram: https://instagram.com/${username}
+        [✗] LinkedIn: غير موجود
+        [✓] تم جمع 14 صورة و 32 منشور`;
+        responseClass = 'success';
+    }
+    else if (command === 'clear') {
+        terminalOutput.innerHTML = '';
         return;
     }
+    else {
+        response = `خطأ: الأمر '${command}' غير معروف. اكتب 'help' لرؤية الأوامر المتاحة`;
+        responseClass = 'error';
+    }
     
-    // بدء الهجوم (محاكاة فقط لأغراض التوضيح)
-    alert(`هجوم DDoS الحقيقي لا يمكن تنفيذه من المتصفح بسبب قيود الأمان. هذه محاكاة فقط.`);
+    if (response) {
+        const responseLines = response.split('\n');
+        responseLines.forEach((line, index) => {
+            setTimeout(() => {
+                const lineElement = document.createElement('div');
+                lineElement.className = `terminal-line ${responseClass}`;
+                lineElement.textContent = line.trim();
+                terminalOutput.appendChild(lineElement);
+                terminalOutput.scrollTop = terminalOutput.scrollHeight;
+            }, index * 100);
+        });
+    }
+}
+
+// محاكاة هجوم DDoS
+function simulateDDoS() {
+    const stats = {
+        requests: 0,
+        success: 0,
+        failed: 0
+    };
     
-    ddosActive = true;
-    successRequests = 0;
-    serverErrors = 0;
-    otherErrors = 0;
-    
-    updateDDoSStats();
-    
-    // محاكاة إرسال الطلبات
     const interval = setInterval(() => {
-        if (!ddosActive) {
-            clearInterval(interval);
-            return;
+        stats.requests += Math.floor(Math.random() * 100) + 50;
+        stats.success += Math.floor(Math.random() * 80) + 40;
+        stats.failed = stats.requests - stats.success;
+        
+        const terminalOutput = document.getElementById('terminalOutput');
+        const statusLine = document.createElement('div');
+        statusLine.className = 'terminal-line info';
+        statusLine.textContent = `[DDoS] الطلبات: ${stats.requests} | الناجحة: ${stats.success} | الفاشلة: ${stats.failed}`;
+        
+        // الاحتفاظ بعدد محدود من الأسطر
+        if (terminalOutput.children.length > 50) {
+            terminalOutput.removeChild(terminalOutput.children[0]);
         }
         
-        // محاكاة نتائج عشوائية
-        const random = Math.random();
-        if (random > 0.7) {
-            successRequests++;
-        } else if (random > 0.4) {
-            serverErrors++;
-        } else {
-            otherErrors++;
-        }
-        
-        updateDDoSStats();
-    }, 100);
-});
-
-// إيقاف هجوم DDoS
-function stopDDoS() {
-    ddosActive = false;
-    document.getElementById('ddosResult').innerHTML += '<p>تم إيقاف الهجوم</p>';
+        terminalOutput.appendChild(statusLine);
+        terminalOutput.scrollTop = terminalOutput.scrollHeight;
+    }, 1000);
+    
+    // إيقاف المحاكاة بعد 10 ثواني
+    setTimeout(() => {
+        clearInterval(interval);
+        const terminalOutput = document.getElementById('terminalOutput');
+        const endLine = document.createElement('div');
+        endLine.className = 'terminal-line success';
+        endLine.textContent = '[DDoS] تم إيقاف الهجوم تلقائياً بعد 10 ثواني';
+        terminalOutput.appendChild(endLine);
+        terminalOutput.scrollTop = terminalOutput.scrollHeight;
+    }, 10000);
 }
 
-// تحديث إحصائيات DDoS
-function updateDDoSStats() {
-    document.getElementById('successRequests').textContent = successRequests;
-    document.getElementById('serverErrors').textContent = serverErrors;
-    document.getElementById('otherErrors').textContent = otherErrors;
-}
+// إعادة حجم تأثير المصفوفة عند تغيير حجم النافذة
+window.onresize = function() {
+    const canvas = document.getElementById('matrixCanvas');
+    if (canvas) {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+};
